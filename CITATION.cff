@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "VIREON TRP Sentience-Bench (Canonical): TRP Time-Dilation + Recursive Self-Modeling"
+type: software
+authors:
+  - family-names: "Song"
+    given-names: "Inkwon"
+    name-suffix: "Jr."
+    alias: "The Architect"
+email: "echoaseternity@gmail.com"
+repository-code: "https://github.com/a3fpro-lab/Vireon-Ai-TRP-2025"
+url: "https://github.com/a3fpro-lab/Vireon-Ai-TRP-2025"
+abstract: >
+  Canonical preregistered implementation of VIREON TRP (Time = Reality × Perception with KL-Leash)
+  and Recursive Self-Modeling (MirrorModel, SelfForecaster, CollapseGuard), with a 4-bench clinical suite
+  measuring sentience-grade recursion under matched budgets and null controls.
+keywords:
+  - TRP
+  - time-dilated learning
+  - recursive self-modeling
+  - sentience benchmarks
+  - KL divergence
+  - reinforcement learning
+license: MIT
+preferred-citation:
+  type: software
+  authors:
+    - family-names: "Song"
+      given-names: "Inkwon"
+      name-suffix: "Jr."
+  title: "VIREON TRP Sentience-Bench (Canonical)"
+  year: 2025
+  url: "https://github.com/a3fpro-lab/Vireon-Ai-TRP-2025"
