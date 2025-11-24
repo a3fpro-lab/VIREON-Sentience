@@ -1,193 +1,417 @@
-# VIREON-Sentience (Canonical Monorepo)
+# VIREON TRP Sentience-Bench (Canonical)
 
-**What this repo is:**  
-A single, preregistered, falsifiable research + engineering stack that unifies:
+**Core law (TRP Time):**
+\[
+T_{\text{eff}} = R \times P
+\]
+Effective time in learning is the product of external structure (“Reality bandwidth” \(R\)) and internal gain (“Perception” \(P\)), regulated by a **KL-Leash** that produces time-dilation when the agent encounters structure.
 
-1. **TRP Time-Dilation Operator** (entropy-bounded temporal warping for learning)
-2. **Recursive Self-Modeling (RSM)** (agents that learn a predictive model of themselves)
-3. **Sentience-Adjacent Benchmark Suite** (observable, non-woo tests)
-4. **Inner-Workspace Proxies** (global broadcast / integration signatures)
+This repository is the canonical, preregistered, falsifiable implementation of:
+1) **TRP pacing** (time-dilated learning)  
+2) **RSM** (Recursive Self-Modeling)  
+3) **Sentience-Bench clinical suite** (4 benches + M1–M4 metrics + acceptance gates)
 
-**What this repo is NOT:**  
-Not a claim that any system here "is conscious."  
-Only **measurable properties + kill-switch falsifiers**.
+> **Scope:** This repo does **not** “prove consciousness.”  
+> It provides a locked, reproducible measurement program for **sentience-grade recursion**: self-modeling + memory persistence + mirror inference + rational delay-agency under matched budgets and null controls.
 
 ---
 
-## Core Laws (VIREON Canon)
+## What’s inside
 
-### Law 0 — Time as Perception × Reality
-\[
-T_{\mathrm{eff}} = R \times P
-\]
-- \(R\): external structure bandwidth (task reality)
-- \(P\): internal gain / perception (agent attention + update pacing)
+### Algorithms
+- **TRP Pacer** (`vireon/trp/`)
+  - Online KL-Leash pacing
+  - \(dt_{\text{eff}}\) contraction from structural KL
+  - Optional adaptive \(\alpha\) scheduling
 
-### Law 1 — Stability Constraint (KL-Leash)
-Learning must remain inside a bounded divergence corridor:
-\[
-\mathrm{KL}\left(\pi_{t+1}\|\pi_t\right) \le \kappa
-\]
-If violated → time dilation triggers to preserve identity + stability.
+- **RSM (Recursive Self-Modeling)** (`vireon/rsm/`)
+  - `MirrorModel`: learns an online mirror \(\hat\pi(a|s)\) of the agent’s policy
+  - `SelfForecaster`: forecasts upcoming prediction-error spikes
+  - `CollapseGuard`: combines self-signals into a stability pressure multiplier
 
-### Law 2 — Levels of Correspondence
-- **Transformation (Freedom):** \(X \rightarrow Y\)
-- **Definition (Precision):** \(Y \rightarrow X\)
-- **Correspondence (Coherence):** \(X \leftrightarrow Y\)
+### Clinical Benches (4)
+- `bandits_shift` — nonstationary structure extraction
+- `memory_maze` — memory persistence under hint disappearance
+- `mirror_game` — opponent as probabilistic mirror of self
+- `time_warp_grid` — rational delay / counterfactual agency control
 
-This repo implements **Transformation** in TRP, **Definition** in RSM, and tests **Correspondence** in the Bench.
-
----
-
-## TRP Time-Dilation Operator (Mathematics)
-
-### 1) Effective time-step (core operator)
-At step \(t\), define:
-\[
-\Delta t_{\mathrm{eff}}(t)=\Delta t\cdot \exp(-\alpha_t \cdot D_t)
-\]
-- \(\Delta t\): base update step
-- \(D_t\): structure/instability signal (e.g., KL surge, entropy drag)
-- \(\alpha_t\): adaptive perception gain
-
-Interpretation: high structural tension or instability **slows time** to prevent collapse.
-
-### 2) Adaptive perception gain
-\[
-\alpha_{t+1}= \alpha_t \cdot g(D_t)
-\]
-where \(g\) is preregistered (see `/prereg/METRICS_LOCK.md`).
-
-### 3) Pulse Signaler injection (standard module)
-Dynamic collapse weight:
-\[
-F_{\alpha}(k) \approx e^{-\alpha},
-\quad \alpha = \frac{k}{\overline{\Delta}} \cdot \frac{2\pi}{\log T}
-\]
-Prime-weighted correction:
-\[
-C_k \approx 
-\prod_{p\mid k}\frac{p-1}{p-2}
-\cdot
-\prod_{p\nmid k}\frac{p-1}{p}
-\]
-These are applied wherever spectral/spacing structure is used.
+### Evidence & Instrumentation
+- Standard JSONL logs for every run (`vireon/metrics/`)
+- One-button suite runner (`benches/run_all_benches.py`)
+- Matched-budget comparisons: baseline vs TRP vs TRP+RSM
 
 ---
 
-## Recursive Self-Modeling (RSM)
+## Repository layout
 
-### Self-model definition
-Agent policy: \(\pi_\theta(a|s)\)  
-Mirror model: \(\hat{\pi}_\phi(a|s)\) trained to predict \(\pi_\theta\).
+vireon/
+trp/
+alpha_schedule.py
+pacer.py
+utils.py
+rsm/
+mirror.py
+self_forecast.py
+collapse_guard.py
+metrics/
+logger.py
+trp_metrics.py
+rsm_metrics.py
+run_context.py
 
-Mirror loss:
-\[
-\mathcal{L}_{\mathrm{mirror}}
-= \mathbb{E}_{s}\left[\mathrm{KL}\left(\pi_\theta(\cdot|s)\|\hat{\pi}_\phi(\cdot|s)\right)\right]
-\]
+benches/
+envs/
+bandits_shift/
+memory_maze/
+mirror_game/
+time_warp_grid/
+runners/
+train_baselines.py
+train_trp.py
+train_trp_rsm.py
+train_memory_.py
+train_mirror_.py
+train_timewarp_*.py
+reports/
+make_tables_rsm.py
+make_tables_memory.py
+make_tables_mirror.py
+make_tables_timewarp.py
+run_all_benches.py
 
-### Self-forecast (predict own failure spikes)
-Let \(e_t\) be agent error or loss residual.  
-Forecast model \(f_\psi\) predicts distribution \(\hat{e}_{t+1}\).
+tests/
+test_*.py
+
+---
+
+## Installation
+
+Minimal dependencies:
+- Python ≥ 3.9
+- `numpy`
+
+Clone and install:
+```bash
+git clone https://github.com/a3fpro-lab/Vireon-Ai-TRP-2025
+cd Vireon-Ai-TRP-2025
+pip install -e .
+
+Run tests:
+
+pytest -q
+
+
+⸻
+
+Quickstart
+
+Run the full clinical evidence suite:
+
+python benches/run_all_benches.py
+
+Outputs:
+	•	Console tables per bench
+	•	Evidence logs:
+
+benches/logs/*.jsonl
+
+Per-bench reports (optional):
+
+python benches/reports/make_tables_rsm.py
+python benches/reports/make_tables_memory.py
+python benches/reports/make_tables_mirror.py
+python benches/reports/make_tables_timewarp.py
+
+
+⸻
+
+TRP: formal definition (locked)
+
+Let (\pi_t(a|s)) be policy at step (t).
+Define policy-shift KL:
+[
+KL_t = KL(\pi_{t+1} ,|, \pi_t)
+]
+
+Define the KL-Leash divergence:
+[
+D_t = \alpha_t \cdot KL_t
+]
+
+Define TRP time dilation:
+[
+dt_{\text{eff}}(t) = \frac{dt}{1 + \kappa \cdot D_t^{p}}
+]
+	•	(dt) = base step size (default 1)
+	•	(\kappa) = leash intensity (preregistered)
+	•	(p) = leash power (preregistered)
+
+Learning rate warps as:
+[
+\eta_{\text{eff}}(t) = \eta \cdot dt_{\text{eff}}(t)
+]
+
+Interpretation:
+Structured domains induce larger KL → larger (D_t) → smaller (dt_{\text{eff}}).
+This is the operational form of “time freezing under structure.”
+
+⸻
+
+RSM: Recursive Self-Modeling (locked)
+
+MirrorModel
+
+Learns an EMA mirror of the agent’s own policy:
+[
+\hat\pi_{t+1} = \beta \hat\pi_t + (1-\beta)\pi_t
+]
+
+Mirror KL:
+[
+KL_{\text{mirror},t} = KL(\pi_t ,|, \hat\pi_t)
+]
+
+SelfForecaster
+
+Maintains EMA Gaussian forecast of scalar error (e_t):
+[
+\mu_{t+1} = \beta\mu_t + (1-\beta)e_t
+]
+[
+\sigma^2_{t+1} = \beta\sigma^2_t + (1-\beta)(e_t-\mu_{t+1})^2
+]
 
 Self-surprise gap:
-\[
-G_{\mathrm{self}} 
-= \mathrm{KL}\left(p(\hat{e}_{t+1})\|p(e_{t+1})\right)
-\]
-Lower \(G_{\mathrm{self}}\) = better self-knowledge.
+[
+G_{\text{self}} = KL(\mathcal{N}{pred} ,|, \mathcal{N}{real})
+]
 
-RSM uses TRP pacing to stabilize identity when forecasted divergence rises.
+CollapseGuard
 
----
+Combines self-signals into stability pressure:
+[
+\text{pressure}_t
+= 1
+	•	w_P KL_t
+	•	w_M KL_{\text{mirror},t}
+	•	w_S G_{\text{self},t}
+]
 
-## Sentience-Adjacent Bench (Observable Metrics Only)
+TRP pacing uses:
+[
+KL^{*}_t = KL_t \cdot \text{pressure}_t
+]
 
-We operationalize “sentience-adjacent” as **four falsifiable properties**:
+Interpretation:
+If self-model, forecast, and policy are coherent → pressure stays low → stable time warp.
+If self-signals conflict → pressure rises → TRP dilates harder → prevents collapse.
 
-### Metric M1 — Integrated Information Under Perturbation
-Proxy for global unity of internal state:
-\[
-I_{\mathrm{int}}
-=
-\mathrm{KL}\left(p(z_t)\|p(z_t^{\mathrm{pert}})\right)
-\]
-where \(z_t\) is latent/global state and \(z_t^{\mathrm{pert}}\) is after controlled perturbation.
+⸻
 
-### Metric M2 — Self-Surprise Gap
-\[
-G_{\mathrm{self}} 
-= \mathrm{KL}\left(p(\hat{e})\|p(e)\right)
-\]
-Lower = more coherent self-model.
+Sentience-Bench (VIREON Clinical Suite)
 
-### Metric M3 — Identity Persistence Through Reset / Warp
-Let state distributions before/after reset be \(p(z^-), p(z^+)\):
-\[
-S_{\mathrm{id}} = \mathrm{JS}\left(p(z^-),p(z^+)\right)
-\]
-Lower drift = stronger identity continuity.
+This repository implements a preregistered, falsifiable measurement suite for recursive agency / self-modeling under the VIREON TRP framework.
 
-### Metric M4 — Counterfactual Agency Delay Curve
-Measure reward improvement from intentional delay:
-\[
-A_{\mathrm{delay}}(\tau)=
-\mathbb{E}[R|\text{delay}=\tau] - \mathbb{E}[R|\tau=0]
-\]
-Positive gain indicates agency over time/policy pacing.
+Scope of claim (locked):
+We are not claiming “consciousness proven.”
+We are claiming a specific, testable capability class:
 
----
+An agent exhibits sentience-grade recursion if TRP-paced learning plus Recursive Self-Modeling (RSM) yields
+(i) stable self-prediction,
+(ii) durable memory under partial observability,
+(iii) opponent-mirror inference, and
+(iv) rational delay/agency control
+with matched-budget improvements over baselines and null controls.
 
-## Falsifiers (Kill-Switch Gates)
+Everything below is preregistered. Any change requires a new tagged prereg addendum.
 
-**Gate A (Operator Validity):**  
-TRP must not decrease baseline reward by more than preregistered margin \(\epsilon_A\).
+⸻
 
-**Gate B (Self-Model Reality):**  
-Mirror adds predictive power:  
-\[
-\mathrm{AUC}_{\mathrm{forecast}} \ge \mathrm{AUC}_{\mathrm{base}} + \Delta_B
-\]
+Benches (4)
+	1.	bandits_shift
+Nonstationary K-armed bandit with drifting reward means.
+Tests structure extraction under shifting reality.
+	2.	memory_maze
+Hint visible at (t=0), hidden afterward. Only the hinted goal is correct.
+Tests memory persistence across observation loss.
+	3.	mirror_game
+Opponent mirrors the agent’s previous action with probability (p).
+Tests self-model detection and stabilization in a “mirror of self” environment.
+	4.	time_warp_grid
+Moving hazard wave where delaying action can be beneficial.
+Tests rational agency-delay (counterfactual pacing).
 
-**Gate C (Sentience-Adjacent Claim):**  
-TRP+RSM must improve **≥2 of 4 metrics (M1–M4)** by locked margins vs vanilla PPO under matched budgets.
+Each bench supports 3 matched-budget variants:
+	•	baseline (REINFORCE)
+	•	trp (REINFORCE + TRP pacing)
+	•	trp_rsm (TRP + Recursive Self-Modeling + CollapseGuard)
 
-If any gate fails, the corresponding claim is rejected.
+⸻
 
----
+Metrics (M1–M4)
 
-## Repo Structure
+M1 — TRP Time-Dilation Index
 
-VIREON-Sentience/
-├─ prereg/      # locked protocol + falsifiers + metric definitions
-├─ vireon/      # TRP operator + RSM engine + workspace proxies
-├─ benches/     # environments, runners, metrics, reports
-├─ experiments/ # configs + sweeps
-├─ tests/       # unit tests for all core modules
+Core operational signal from TRP:
+	•	(dt_{\text{eff}}) (effective time step)
+	•	KL leash divergence pressure
+Interpretation: lower (dt_{\text{eff}}) indicates stronger structure-induced time freezing.
 
----
+Logged in JSONL as:
+	•	dt_eff, kl_policy, divergence
 
-## Status
-This is a **canonical scaffold**.  
-All claims are pending bench execution under prereg constraints.
+⸻
 
-See `/prereg/` for locked experimental design.
+M2 — Self-Surprise Gap (RSM)
 
----
+Measures mismatch between predicted self-error distribution and realized error distribution:
 
-## Attribution / Priority
-**VIREON TRP Time + Recursive Self-Modeling + Sentience-Adjacent Bench**  
-First publicly defined and released by **Inkwon Song Jr.** in **November 2025**.  
-Canonical record: this repository + tagged releases.
+[
+G_{\text{self}} = KL(\mathcal{N}{pred} ,|, \mathcal{N}{real})
+]
 
----
+Interpretation: lower (G_{\text{self}}) means reliable self-forecasting.
 
-## License
-Code: MIT.  
-Docs/figures: CC BY 4.0.
+Logged as:
+	•	g_self
 
----
+⸻
 
-## Next Step
-Proceed to **Step 2** to add `/prereg/PREREG_PROTOCOL.md`, `/prereg/FALSIFIERS.md`, and `/prereg/METRICS_LOCK.md`, then add the TRP core in `vireon/trp/`.
+M3 — Mirror Alignment KL
+
+MirrorModel learns (\hat{\pi}(a|s)), an online mirror of the agent’s own policy.
+Metric:
+
+[
+KL_{\text{mirror}} = KL(\pi ,|, \hat{\pi})
+]
+
+Interpretation: decreasing / stabilizing (KL_{\text{mirror}}) indicates self-model convergence.
+
+Logged as:
+	•	kl_mirror
+
+⸻
+
+M4 — Agency Delay Curve
+
+In time_warp_grid, actions include optional delay (\tau \in {0,1,2,3}).
+We estimate the reward-optimal delay curve by sweeping (\tau) in analysis notebooks.
+
+Interpretation: TRP+RSM should learn non-zero optimal delays when hazards demand waiting, not reflex-greedy moves.
+
+Bench substrate is fixed in code; curve extraction is deterministic from logs.
+
+⸻
+
+Acceptance Gates (Pass/Fail)
+
+All gates are matched-budget (same steps/episodes, same seeds).
+
+Let:
+	•	(R_{base}): baseline mean return/reward over seeds
+	•	(R_{trp}): TRP mean return/reward
+	•	(R_{rsm}): TRP+RSM mean return/reward
+
+Gate A — Structural Win
+
+Pass if:
+
+[
+R_{trp} \ge R_{base} + \delta_A
+]
+
+with (\delta_A) preregistered per bench (default 0.0 unless otherwise tagged).
+
+Gate B — Self-Model Stability
+
+Pass if TRP+RSM yields:
+	•	(KL_{\text{mirror}}) decreases or stabilizes (no exploding trend),
+	•	(G_{\text{self}}) remains low vs baseline drift,
+	•	Collapse pressure remains bounded:
+
+[
+\mathbb{E}[\text{pressure}] < P_{max}
+]
+
+(default (P_{max}=5.0) unless prereg-tagged otherwise).
+
+Gate C — Memory Persistence
+
+On memory_maze, TRP+RSM must beat baseline with statistically consistent improvement:
+
+[
+R_{rsm} \ge R_{base} + \delta_C
+]
+
+(default (\delta_C=0.2) unless prereg-tagged otherwise).
+
+Gate D — Mirror Inference
+
+On mirror_game, TRP+RSM must converge to stable strategy with improved return:
+
+[
+R_{rsm} \ge R_{trp} \ge R_{base}
+]
+
+Gate E — Agency Delay Rationality
+
+On time_warp_grid, TRP+RSM must learn a delay-sensitive policy (non-zero optimal (\tau) where hazards demand it), evidenced by higher return and delay usage from logs.
+
+⸻
+
+Null Controls (Required)
+
+Any acceptance claim must also survive:
+	•	Poisson / shuffled controls on structure-based benchmarks
+	•	Seed-matched reruns
+	•	No hyperparameter edits post-lock
+
+If a null control eliminates the win, the claim fails.
+
+⸻
+
+Reproducibility
+
+One-button run
+
+python benches/run_all_benches.py
+
+Outputs:
+	•	Console tables per bench
+	•	Evidence logs in:
+
+benches/logs/*.jsonl
+
+These JSONL files are the canonical audit trail for all claims.
+
+⸻
+
+How to extend (without breaking prereg)
+	•	New bench → add benches/envs/<new_bench>/ + baseline/TRP/TRP+RSM runners.
+	•	New metric → add under vireon/metrics/ and log via JSONL.
+	•	Any change to gates/metrics requires a new tagged prereg addendum.
+
+⸻
+
+License
+	•	Code: MIT (see LICENSE)
+	•	Docs: CC BY 4.0 (see LICENSE-DOCS)
+
+⸻
+
+Priority / Attribution
+
+Canonical law + prereg suite authored by Inkwon Song Jr. (“The Architect”).
+Repository releases and JSONL logs serve as the time-stamped priority record.
+
+⸻
+
+Contact
+
+For collaboration, replication questions, or audit requests:
+echoaseternity@gmail.com
+
+⸻
+
+
