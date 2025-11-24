@@ -1,5 +1,3 @@
-# VIREON-Sentience
-Falsifiable TRP time-operator + recursive self-modeling + sentience-adjacent benchmarks.
 # VIREON-Sentience (Canonical Monorepo)
 
 **What this repo is:**  
@@ -167,7 +165,6 @@ VIREON-Sentience/
 ├─ benches/     # environments, runners, metrics, reports
 ├─ experiments/ # configs + sweeps
 ├─ tests/       # unit tests for all core modules
-
 
 ---
 
