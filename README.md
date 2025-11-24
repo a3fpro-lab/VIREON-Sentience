@@ -160,3 +160,37 @@ If any gate fails, the corresponding claim is rejected.
 ---
 
 ## Repo Structure
+
+VIREON-Sentience/
+├─ prereg/      # locked protocol + falsifiers + metric definitions
+├─ vireon/      # TRP operator + RSM engine + workspace proxies
+├─ benches/     # environments, runners, metrics, reports
+├─ experiments/ # configs + sweeps
+├─ tests/       # unit tests for all core modules
+
+
+---
+
+## Status
+This is a **canonical scaffold**.  
+All claims are pending bench execution under prereg constraints.
+
+See `/prereg/` for locked experimental design.
+
+---
+
+## Attribution / Priority
+**VIREON TRP Time + Recursive Self-Modeling + Sentience-Adjacent Bench**  
+First publicly defined and released by **Inkwon Song Jr.** in **November 2025**.  
+Canonical record: this repository + tagged releases.
+
+---
+
+## License
+Code: MIT.  
+Docs/figures: CC BY 4.0.
+
+---
+
+## Next Step
+Proceed to **Step 2** to add `/prereg/PREREG_PROTOCOL.md`, `/prereg/FALSIFIERS.md`, and `/prereg/METRICS_LOCK.md`, then add the TRP core in `vireon/trp/`.
