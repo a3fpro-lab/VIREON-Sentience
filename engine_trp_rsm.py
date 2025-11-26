@@ -10,9 +10,12 @@ Core ideas:
 - Policy: acts from (s_t, h_t); updates are TRP-gated by a KL trust-region
 - Multi-agent consensus: agents negotiate a shared latent via trust-weighted averaging
 
-This file is deliberately modular and minimal:
-- Plug in your own Encoder / SelfModel / WorldModel / Policy / ValueNet.
-- Plug in your own structure_signal() and perception_gain() for R_t and P_t.
+Hooks for sentience metrics:
+- StepLog is used by sentience_metrics.compute_smc(...)
+- Agent stores:
+    - _state_trace            → for Identity Continuity Index (ICI)
+    - _logits_with_self_trace → for Self Influence Index (SII)
+    - _logits_no_self_trace   → for SII (shadow "no-self" policy)
 """
 
 from __future__ import annotations
@@ -90,7 +93,11 @@ class TRPClock:
     def __init__(self, cfg: TRPConfig):
         self.cfg = cfg
 
-    def step(self, R_t: torch.Tensor, P_t: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    def step(
+        self,
+        R_t: torch.Tensor,
+        P_t: torch.Tensor
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         R_t, P_t: scalar tensors or broadcastable; returns (T_t, eta_t, eps_t)
         """
@@ -164,6 +171,24 @@ class PolicyNet(nn.Module):
         return logits  # (batch, num_actions)
 
 
+class PolicyNetNoSelf(nn.Module):
+    """
+    Shadow policy that ignores internal self-state s_t.
+    Used to estimate Self Influence Index (SII).
+    It still uses x via h_t, but not s_t directly.
+    """
+    def __init__(self, x_dim: int, h_dim: int, num_actions: int):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(x_dim + h_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, num_actions),
+        )
+
+    def forward(self, x: torch.Tensor, h: torch.Tensor) -> torch.Tensor:
+        return self.net(torch.cat([x, h], dim=-1))
+
+
 class ValueNet(nn.Module):
     def __init__(self, s_dim: int, h_dim: int):
         super().__init__()
@@ -231,6 +256,11 @@ class RSMPTRPAgent(nn.Module):
       - TRP clock gating learning rate & KL budget
       - RSM + world model consistency losses
       - TRP KL-leashed update (prox-like via step scaling)
+
+    Metrics hooks:
+      - self._state_trace: List[(dim,)] mean self-state snapshot per update
+      - self._logits_with_self_trace: List[(batch,A)] logits including s_t
+      - self._logits_no_self_trace:   List[(batch,A)] logits from shadow policy
     """
 
     def __init__(
@@ -253,6 +283,9 @@ class RSMPTRPAgent(nn.Module):
         self.policy = PolicyNet(s_dim, h_dim=64, num_actions=num_actions).to(self.device)
         self.value_net = ValueNet(s_dim, h_dim=64).to(self.device)
 
+        # Shadow "no-self" policy for SII
+        self.policy_no_self = PolicyNetNoSelf(x_dim, h_dim=64, num_actions=num_actions).to(self.device)
+
         self.trp_cfg = trp_cfg
         self.trp_clock = TRPClock(trp_cfg)
         self.loss_w = loss_weights
@@ -263,6 +296,11 @@ class RSMPTRPAgent(nn.Module):
 
         # Storage for previous policy logits (for KL)
         self._last_policy_logits: Optional[torch.Tensor] = None
+
+        # Traces for metrics
+        self._state_trace: List[torch.Tensor] = []
+        self._logits_with_self_trace: List[torch.Tensor] = []
+        self._logits_no_self_trace: List[torch.Tensor] = []
 
     # ---------------------------------------------------------------------
     # Forward / rollout primitives
@@ -280,6 +318,12 @@ class RSMPTRPAgent(nn.Module):
     def policy_logits(self, s: torch.Tensor, h: torch.Tensor) -> torch.Tensor:
         return self.policy(s, h)
 
+    def policy_logits_no_self(self, x: torch.Tensor, h: torch.Tensor) -> torch.Tensor:
+        """
+        Shadow logits ignoring s_t (uses x + h only).
+        """
+        return self.policy_no_self(x, h)
+
     def value(self, s: torch.Tensor, h: torch.Tensor) -> torch.Tensor:
         return self.value_net(s, h)
 
@@ -292,6 +336,34 @@ class RSMPTRPAgent(nn.Module):
         dist = torch.distributions.Categorical(probs=probs)
         a = dist.sample()
         return a, logits
+
+    # ---------------------------------------------------------------------
+    # Accessors for metric traces
+    # ---------------------------------------------------------------------
+
+    def get_state_trace(self) -> Optional[torch.Tensor]:
+        """
+        Returns self-state trace as (T, dim) tensor or None if empty.
+        """
+        if not self._state_trace:
+            return None
+        return torch.stack(self._state_trace, dim=0)
+
+    def get_policy_trace_with_self(self) -> Optional[torch.Tensor]:
+        """
+        Returns logits_with_self trace as (T, batch, A) tensor or None.
+        """
+        if not self._logits_with_self_trace:
+            return None
+        return torch.stack(self._logits_with_self_trace, dim=0)
+
+    def get_policy_trace_no_self(self) -> Optional[torch.Tensor]:
+        """
+        Returns logits_no_self trace as (T, batch, A) tensor or None.
+        """
+        if not self._logits_no_self_trace:
+            return None
+        return torch.stack(self._logits_no_self_trace, dim=0)
 
     # ---------------------------------------------------------------------
     # Losses
@@ -330,7 +402,8 @@ class RSMPTRPAgent(nn.Module):
         """
         if old_logits is None:
             # First step: no KL constraint
-            return torch.tensor(0.0, device=new_logits.device), torch.tensor(0.0, device=new_logits.device)
+            device = new_logits.device
+            return torch.tensor(0.0, device=device), torch.tensor(0.0, device=device)
 
         d_kl = kl_categorical(old_logits.detach(), new_logits)  # (batch,1)
         d_kl_mean = d_kl.mean()
@@ -347,7 +420,7 @@ class RSMPTRPAgent(nn.Module):
         self,
         batch: Dict[str, torch.Tensor],
         x_prev: torch.Tensor,
-        log_advantages: bool = False,
+        t: int = 0,
     ) -> StepLog:
         """
         Perform one TRP-gated gradient update on a batch of transitions.
@@ -355,6 +428,9 @@ class RSMPTRPAgent(nn.Module):
         batch keys (minimal):
             'x_t', 's_t', 'z_t', 'x_next', 's_next', 'z_next',
             'actions', 'returns', 'advantages'
+
+        x_prev: previous observation (same shape as x_t)
+        t:      global step index (for logging)
         """
 
         # Move to device
@@ -375,9 +451,12 @@ class RSMPTRPAgent(nn.Module):
         s_hat_next = self.predict_self(s_t, h_t)
         z_hat_next = self.predict_world(s_t, h_t)
 
-        # Policy + value
+        # Policy + value (with self)
         logits = self.policy_logits(s_t, h_t)
         values = self.value(s_t, h_t)
+
+        # Shadow policy logits ignoring self (for SII)
+        logits_no_self = self.policy_logits_no_self(x_t, h_t)
 
         # Structure + perception signals
         R_t = structure_signal(x_t, x_prev.to(self.device))  # (batch,1)
@@ -415,6 +494,15 @@ class RSMPTRPAgent(nn.Module):
         # Update stored logits for KL reference
         self._last_policy_logits = logits.detach()
 
+        # ---- Metrics traces (no grad) -----------------------------------
+        with torch.no_grad():
+            # Mean self-state snapshot (for ICI, etc.)
+            self._state_trace.append(s_t.detach().mean(dim=0))
+            # Store full logits for SII
+            self._logits_with_self_trace.append(logits.detach())
+            self._logits_no_self_trace.append(logits_no_self.detach())
+        # -----------------------------------------------------------------
+
         # Gate diagnostics
         d_self_val = self.self_loss(s_next, s_hat_next).detach().item()
         d_world_val = self.world_loss(z_next, z_hat_next).detach().item()
@@ -427,7 +515,7 @@ class RSMPTRPAgent(nn.Module):
         )
 
         step_log = StepLog(
-            t=0,  # you can fill in real t from caller
+            t=t,
             R_t=R_t.mean().item(),
             P_t=P_t.mean().item(),
             T_t=T_t.mean().item(),
@@ -459,7 +547,7 @@ class MultiAgentRSMPTRP:
     to store per-agent batches. The key bits:
       - trust weights w_i
       - consensus latent z_bar
-      - social loss L_social per agent
+      - social loss L_social per agent (optional)
       - trust decay based on d_social
     """
 
@@ -487,7 +575,6 @@ class MultiAgentRSMPTRP:
         z_hats: list of (batch, z_dim) predicted latents from each agent.
         Returns trust-weighted average latent (batch, z_dim).
         """
-        # w: (n_agents,1) → (n_agents,batch,1)
         batch_size = z_hats[0].shape[0]
         w_expanded = self.w.view(self.num_agents, 1, 1).expand(-1, batch_size, 1)
         z_stack = torch.stack(z_hats, dim=0)  # (n_agents, batch, z_dim)
