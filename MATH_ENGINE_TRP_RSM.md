@@ -483,4 +483,167 @@ for the TRP–RSM multi-agent system.
 These are structural and empirical properties, not claims of
 phenomenal consciousness.
 
+## 8. Basic Theorems
+
+This section collects elementary but useful properties of the TRP–RSM
+engine and C-metrics. They are intentionally modest and fully
+formalizable from the definitions above.
+
+### Theorem 1 (TRP Time Dilation Bounds and Monotonicity)
+
+For fixed \(\gamma > 0\), reality \(R_t \ge 0\), perception \(P_t \ge 0\),
+and
+\[
+T_t = R_t P_t, \qquad
+\mathrm{dt}_{\text{eff}, t}
+  = \frac{1}{1 + \gamma T_t},
+\]
+we have:
+
+1. \(0 < \mathrm{dt}_{\text{eff}, t} \le 1\) for all \(t\).
+2. \(\mathrm{dt}_{\text{eff}, t}\) is strictly decreasing in \(T_t\) whenever \(T_t > 0\).
+3. The TRP learning rate \(\eta_t = \eta_0 \mathrm{dt}_{\text{eff}, t}\) satisfies
+   \(0 < \eta_t \le \eta_0\) and is strictly decreasing in \(T_t\) for \(T_t > 0\).
+
+**Proof.**
+
+1. Since \(R_t, P_t \ge 0\), we have \(T_t \ge 0\). Thus
+   \(1 + \gamma T_t \ge 1\), so
+   \[
+   0 < \frac{1}{1 + \gamma T_t} \le 1.
+   \]
+   Hence \(0 < \mathrm{dt}_{\text{eff}, t} \le 1\).
+
+2. For \(T_t > 0\),
+   \[
+   \frac{\partial}{\partial T_t}
+   \mathrm{dt}_{\text{eff}, t}
+   = \frac{\partial}{\partial T_t}
+     \frac{1}{1 + \gamma T_t}
+   = - \frac{\gamma}{(1 + \gamma T_t)^2} < 0,
+   \]
+   so \(\mathrm{dt}_{\text{eff}, t}\) is strictly decreasing in \(T_t\).
+
+3. Since \(\eta_t = \eta_0 \mathrm{dt}_{\text{eff}, t}\) with \(\eta_0 > 0\),
+   the bounds follow from (1) and monotonicity from (2). \(\square\)
+
+---
+
+### Theorem 2 (KL Budget Bounds and Monotonicity)
+
+Let \(\varepsilon_0 > 0\), \(\beta > 0\), and define
+\[
+\varepsilon_t
+= \varepsilon_0 \, \mathrm{dt}_{\text{eff}, t}^{\beta}
+= \varepsilon_0 \bigg(\frac{1}{1 + \gamma T_t}\bigg)^{\beta}.
+\]
+Then:
+
+1. \(\varepsilon_t > 0\) for all \(t\).
+2. \(\varepsilon_t \le \varepsilon_0\) for all \(t\).
+3. \(\varepsilon_t\) is strictly decreasing in \(T_t\) whenever \(T_t > 0\).
+
+**Proof.**
+
+1. Since \(\mathrm{dt}_{\text{eff}, t} > 0\) and \(\beta > 0\), we have
+   \(\mathrm{dt}_{\text{eff}, t}^{\beta} > 0\). With \(\varepsilon_0 > 0\), the product
+   is positive.
+
+2. From Theorem 1, \(0 < \mathrm{dt}_{\text{eff}, t} \le 1\). Raising to \(\beta > 0\)
+   preserves the inequality, giving
+   \(0 < \mathrm{dt}_{\text{eff}, t}^{\beta} \le 1\),
+   so \(\varepsilon_t \le \varepsilon_0\).
+
+3. Since \(\mathrm{dt}_{\text{eff}, t}\) is strictly decreasing in \(T_t > 0\) and
+   \(x \mapsto x^{\beta}\) is strictly increasing on \((0,1]\) for \(\beta > 0\),
+   their composition is strictly decreasing. Multiplication by \(\varepsilon_0 > 0\)
+   preserves strict monotonicity. \(\square\)
+
+---
+
+### Proposition 3 (C-Metrics Bounds)
+
+Let:
+
+- SMC be defined as
+  \[
+  \mathrm{SMC}
+  = 1 - \frac{1}{T} \sum_{t=1}^T
+      \min\Big(1, \frac{d_{\text{self}, t}}{\max(\tau_{\text{self}}, 10^{-8})}\Big),
+  \]
+- ICI by
+  \[
+  \mathrm{ICI}
+  = \frac{1}{1 + \Delta_s(\Delta)},
+  \quad
+  \Delta_s(\Delta) =
+  \frac{1}{T - \Delta} \sum_{t=1}^{T-\Delta}
+    \lVert s_{t+\Delta} - s_t \rVert_2^2,
+  \]
+- IGI as an average of fractions in \([0,1]\),
+- SII as
+  \[
+  \mathrm{SII}
+  = \mathbb{E}_t\big[D_{\text{KL}}(p_t \Vert q_t)\big]
+  \]
+  with \(p_t, q_t\) probability distributions over a finite action set.
+
+Then:
+
+1. \(0 \le \mathrm{SMC} \le 1\).
+2. \(0 < \mathrm{ICI} \le 1\).
+3. \(0 \le \mathrm{IGI} \le 1\).
+4. \(\mathrm{SII} \ge 0\).
+
+**Proof.**
+
+1. For each \(t\),
+   \[
+   0 \le \min\Big(1, \frac{d_{\text{self}, t}}{\max(\tau_{\text{self}}, 10^{-8})}\Big) \le 1.
+   \]
+   The average lies in \([0,1]\); subtracting from 1 keeps us in \([0,1]\).
+
+2. By definition, \(\Delta_s(\Delta) \ge 0\), so \(1 + \Delta_s(\Delta) \ge 1\),
+   and thus
+   \[
+   0 < \frac{1}{1 + \Delta_s(\Delta)} \le 1.
+   \]
+
+3. IGI is defined as an average of response fractions where each fraction
+   is in \([0,1]\), so the result lies in \([0,1]\).
+
+4. KL divergence between two discrete distributions is always
+   non-negative, so \(\mathrm{SII}\), as an expectation of KL terms,
+   is also non-negative. \(\square\)
+
+---
+
+### Proposition 4 (Self Influence Index Detects Policy Equality)
+
+Let \(p_t(a)\) and \(q_t(a)\) be two categorical policies over a finite
+action set \(\mathcal{A}\), and define
+\[
+\mathrm{SII}
+= \mathbb{E}_t \big[ D_{\text{KL}}(p_t \Vert q_t) \big].
+\]
+
+Assume that the expectation is taken over a distribution on \(t\) with
+support on all encountered states. Then:
+
+1. \(\mathrm{SII} = 0\) if and only if \(p_t(a) = q_t(a)\) for all \(a \in \mathcal{A}\) and for all \(t\) in the support.
+2. If \(p_t \neq q_t\) on a set of non-zero measure in \(t\), then
+   \(\mathrm{SII} > 0\).
+
+**Proof.**
+
+For each fixed \(t\), \(D_{\text{KL}}(p_t \Vert q_t) \ge 0\), with equality
+if and only if \(p_t(a) = q_t(a)\) for all \(a\). If \(p_t = q_t\) for all
+\(t\) in the support, then every KL term is zero and thus
+\(\mathrm{SII} = 0\).
+
+Conversely, if there exists a set of \(t\) of non-zero measure where
+\(p_t \neq q_t\), then the KL divergence is strictly positive on that set,
+and its expectation over \(t\) is strictly positive, yielding
+\(\mathrm{SII} > 0\). \(\square\)
+
 ---
