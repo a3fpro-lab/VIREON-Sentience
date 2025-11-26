@@ -103,6 +103,32 @@ pytest -q
 
 ⸻
 
+## Sentience Engine Quickstart
+
+This repo implements a TRP–RSM Sentience Engine:
+
+- **TRP clock**: \(T_t = R_t \times P_t\), with dt\_eff, learning rate \(\eta_t\), and KL budget \(\varepsilon_t\) all gated by structure (R) and perception (P).
+- **RSM**: self-model predicts next internal state \(s_{t+1}\).
+- **World model**: predicts next latent \(z_{t+1}\).
+- **Policy**: acts under a TRP KL trust region.
+- **Multi-agent**: (optional) trust-weighted consensus + social disagreement.
+
+We expose a **C-vector** of “consciousness-flavored” diagnostics:
+
+- **C1 – SMC**: Self-Model Coherence  
+- **C2 – SII**: Self Influence Index (effect of self-state on actions)  
+- **C3 – ICI**: Identity Continuity Index  
+- **C4 – IGI**: Ignition Index (global broadcast of surprise)  
+
+These are *metrics*, not claims of literal phenomenology.
+
+### 1. Random wiring demo
+
+Runs the engine on a synthetic environment to confirm all plumbing + metrics:
+
+```bash
+python sentience_run_demo.py
+
 Quickstart
 
 Run the full clinical evidence suite:
