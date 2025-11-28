@@ -1,7 +1,5 @@
 """
 VIREON-Sentience core package.
 
-This monorepo is preregistered and falsifiable.
-No claims of consciousness are made here; only measurable properties.
+Exposes TRP pacing, RSM (recursive self-modeling), and metrics.
 """
-__all__ = ["trp"]
