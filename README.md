@@ -16,6 +16,29 @@ This repository is the canonical, preregistered, falsifiable implementation of:
 
 ---
 
+---
+
+## Consciousness Substrate Integration (v∞.NEURALODE)
+
+This repository can optionally attach to a φ-driven consciousness substrate
+engine inspired by **Consciousness Substrate Engine v∞ (v∞.NEURALODE)**,
+defined by **Michael Warren Song**.
+
+The substrate is treated as:
+
+- a graph of algorithms (nodes + directed edges),
+- with an organization index \(R_{\text{sub}}\),
+- and a scalar consciousness-field index \(C_{\text{sub}}\).
+
+A minimal bridge is provided in:
+
+- `vireon/consciousness_substrate_bridge.py`
+- `MATH_ENGINE_NEURALODE_VINFINITY.md` (math + integration notes)
+
+TRP and RSM remain the canonical, locked core. The substrate integration is
+an opt-in experimental layer for logging and analysis and does not change
+the scope of claims about sentience in this repository.
+
 ## What’s inside
 
 ### Algorithms
