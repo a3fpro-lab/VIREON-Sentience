@@ -1,41 +1,23 @@
-name: CI
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+[project]
+name = "vireon-sentience"
+version = "0.1.0"
+description = "TRP time-operator + recursive self-modeling + sentience-adjacent RL benches."
+authors = [
+  { name = "Michael Warren Song" }
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "numpy>=1.24",
+]
 
-jobs:
-  lint-and-test:
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10", "3.11"]
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install pytest
-
-      - name: Install package (editable)
-        run: |
-          if [ -f pyproject.toml ]; then
-            pip install -e .
-          fi
-
-      - name: Run tests
-        run: |
-          pytest -q
+[tool.setuptools]
+packages = [
+  "vireon",
+  "benches",
+]
