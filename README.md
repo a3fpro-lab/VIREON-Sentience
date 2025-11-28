@@ -113,15 +113,22 @@ Minimal dependencies:
 - Python ≥ 3.9
 - `numpy`
 
+## Installation
+
+Minimal dependencies:
+
+- Python ≥ 3.9
+- `numpy`
+- `torch` (for agents and RSM)
+- `gymnasium` or `gym` (for some benches)
+- `pytest` (for tests)
+
 Clone and install:
+
 ```bash
-git clone https://github.com/a3fpro-lab/Vireon-Ai-TRP-2025
-cd Vireon-Ai-TRP-2025
+git clone https://github.com/a3fpro-lab/VIREON-Sentience
+cd VIREON-Sentience
 pip install -e .
-
-Run tests:
-
-pytest -q
 
 
 ⸻
