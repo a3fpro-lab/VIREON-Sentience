@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vireon-sentience"
+version = "0.1.0"
+description = "Falsifiable TRP time-operator + recursive self-modeling + sentience-adjacent benches."
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=1.24",
+]
+
+[tool.setuptools]
+packages = [
+    "vireon",
+    "benches",
+]
