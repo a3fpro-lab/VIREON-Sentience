@@ -10,7 +10,7 @@ It doesn't assume a specific RL algorithm; it just outputs dt_eff and alpha_next
 """
 
 from __future__ import annotations
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from .warp import dt_eff_from_divergence
 from .leash import kl_leash_scale
@@ -32,7 +32,7 @@ class TRPPacer:
     dt: float = 1.0
     kappa: float = 0.01
     leash_power: float = 1.0
-    alpha_schedule: AlphaSchedule = AlphaSchedule()
+    alpha_schedule: AlphaSchedule = field(default_factory=AlphaSchedule)
     dt_min: float = 1e-18
 
     def __post_init__(self):
