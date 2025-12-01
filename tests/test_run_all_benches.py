@@ -12,4 +12,4 @@ def test_log_bandits_small():
     b, t, r = log_bandits(seed=0, steps=50)
     assert isinstance(b, float)
     assert isinstance(t, float)
-    assert isinstance(r, float)p
+    assert isinstance(r, float)
